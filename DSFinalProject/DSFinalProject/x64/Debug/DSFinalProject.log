@@ -1,2 +1,3 @@
 ﻿  Program.c
-  DSFinalProject.vcxproj -> C:\Users\Bibi Murwarid\DS-FINAL\DSFinalProject\x64\Debug\DSFinalProject.exe
+C:\Source\College\SENG1050-DS\DS-FINAL\DSFinalProject\DSFinalProject\Program.c(194,4): warning C4013: 'gets' undefined; assuming extern returning int
+  DSFinalProject.vcxproj -> C:\Source\College\SENG1050-DS\DS-FINAL\DSFinalProject\x64\Debug\DSFinalProject.exe
