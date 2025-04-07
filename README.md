@@ -2,7 +2,7 @@
 THIS PROJECT IS FOR OUR FINAL PROJECT 
 
 ```
-- Final Submission: Aprial 12th (SAT), 2025
+- Final Submission: April 12th (SAT), 2025
 - Presentation & Demo: Week of April 14th
 ```
 ### 1. Introduction
