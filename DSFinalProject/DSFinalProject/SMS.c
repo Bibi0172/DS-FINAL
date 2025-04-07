@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-char* dates[TOTAL_DAYS] = { "May 1", "May 2", "May 3", "May 4", "May 5", "May 6", "May 7"};
+char* dates[TOTAL_DAYS] = { "May 1", "May 2", "May 3", "May 4", "May 5", "May 6", "May 7" };
 
 void insertMeeting(HashTable* ht, char* date, int studentID, char* name, char* title, int time) {
 
@@ -27,9 +27,20 @@ void insertMeeting(HashTable* ht, char* date, int studentID, char* name, char* t
 		current = current->next;
 	}
 
+	// Check if maximum slots are reached
+	if (q->count >= MAX_SLOTS) {
+		printf("All slots are booked for %s. Please choose a different date.\n", date);
+		return;
+	}
 
 	// Create new meeting node
 	Meeting* newMeeting = (Meeting*)malloc(sizeof(Meeting));
+
+	if (newMeeting == NULL) {
+		printf("[insertMeeting] Insufficient memory\n");
+		return;
+	}
+
 	newMeeting->studentID = studentID;
 	strcpy(newMeeting->name, name);
 	strcpy(newMeeting->title, title);
@@ -49,6 +60,11 @@ void insertMeeting(HashTable* ht, char* date, int studentID, char* name, char* t
 	printf("Meeting booked successfully on %s for Student ID %d at %d.\n", date, studentID, time);
 }
 void cancelMeeting(HashTable* ht, char* date, int studentID) {
+	if (ht == NULL || date == NULL) {
+		printf("Error: Invalid parameters for cancellation\n");
+		return;
+	}
+
 	int index = -1;
 	for (int i = 0; i < TOTAL_DAYS; i++) {
 		if (strcmp(ht[i].date, date) == 0) {
@@ -63,7 +79,8 @@ void cancelMeeting(HashTable* ht, char* date, int studentID) {
 		return;
 	}
 
-	Meeting* temp = q->front, * prev = NULL;
+	Meeting* temp = q->front;
+	Meeting* prev = NULL;
 
 	// Search for meeting with matching Student ID
 	while (temp != NULL && temp->studentID != studentID) {
@@ -94,6 +111,11 @@ void cancelMeeting(HashTable* ht, char* date, int studentID) {
 	printf("Meeting canceled for Student ID %d on %s.\n", studentID, date);
 }
 void searchMeeting(HashTable* ht, char* date, int studentID) {
+	if (ht == NULL || date == NULL) {
+		printf("Error: Invalid parameters for search\n");
+		return;
+	}
+
 	int index = -1;
 	for (int i = 0; i < TOTAL_DAYS; i++) {
 		if (strcmp(ht[i].date, date) == 0) {
@@ -122,6 +144,11 @@ void searchMeeting(HashTable* ht, char* date, int studentID) {
 	printf("No meeting found for Student ID %d on %s.\n", studentID, date);
 }
 void viewUpcomingMeetings(HashTable* ht) {
+	if (ht == NULL) {
+		printf("Error: Invalid hash table\n");
+		return;
+	}
+
 	printf("\nUpcoming Meetings:\n");
 	for (int i = 0; i < TOTAL_DAYS; i++) {
 		Queue* q = ht[i].meetingQueue;
@@ -135,4 +162,3 @@ void viewUpcomingMeetings(HashTable* ht) {
 		printf("\n");
 	}
 }
-

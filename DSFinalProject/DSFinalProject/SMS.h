@@ -1,18 +1,21 @@
 #define _CRT_SECURE_NO_WARNINGS 
-
-#ifndef SMS_H
-#define SMS_H
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifndef SMS_H
+#define SMS_H
+
 #define TOTAL_DAYS 7
 #define MAX_SLOTS 3
-
+#define MAX_NAME_LENGTH		50
+#define MAX_TITLE_LENGTH	100
+#define MAX_DATE_LENGTH     12
 
 typedef struct Meeting {
     int studentID;
-    char name[50];
-    char title[100];
+    char name[MAX_NAME_LENGTH];
+    char title[MAX_TITLE_LENGTH];
     int time;
     struct Meeting* next;
 } Meeting;
@@ -24,7 +27,7 @@ typedef struct Queue {
 } Queue;
 
 typedef struct HashTable {
-    char date[12];
+    char date[MAX_DATE_LENGTH];
     Queue* meetingQueue;
 } HashTable;
 
@@ -35,5 +38,7 @@ void insertMeeting(HashTable* ht, char* date, int studentID, char* name, char* t
 void cancelMeeting(HashTable* ht, char* date, int studentID);
 void searchMeeting(HashTable* ht, char* date, int studentID);
 void viewUpcomingMeetings(HashTable* ht);
+
+void freeAllDataStructures(HashTable* meetingTable);
 
 #endif

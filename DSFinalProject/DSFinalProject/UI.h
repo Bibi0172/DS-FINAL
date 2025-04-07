@@ -1,8 +1,17 @@
+#include "SMS.h"
+
 #ifndef UI_H
 #define UI_H
 
-#include "SMS.h"
+#define MAX_MEETING_SLOT_COUNT	3
 
+typedef enum {
+	BOOK = 1,
+	CANCEL,
+	SEARCH,
+	VIEW,
+	EXIT_PROGRAM,
+} KIND_OF_MENU;
 
 void displayMenu(HashTable* ht);
 int validMenuChoice(int maxNumber);
