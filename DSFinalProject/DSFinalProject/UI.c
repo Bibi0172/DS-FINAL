@@ -25,32 +25,37 @@ void displayMenu(HashTable* ht, OperationStack* opStack, KVP** logList) {
 		switch (choice) {
 		case BOOK:
 			dateChoice = getValidDateChoice();
-			if (dateChoice == -1) break;
-			{
-				Queue* q = ht[dateChoice].meetingQueue;
-				timeChoice = getValidTimeSlot(q);
-				if (timeChoice == -1) break;
-				getValidUserInput(&studentID, name, title);
-				insertMeeting(ht, dates[dateChoice], studentID, name, title, timeChoice);
-				// Create operation record for booking
-
-				op.type = OP_BOOK;
-				strcpy_s(op.date, MAX_DATE_LENGTH, dates[dateChoice]);
-				op.studentID = studentID;
-				strcpy_s(op.name, MAX_NAME_LENGTH, name);
-				strcpy_s(op.title, MAX_TITLE_LENGTH, title);
-				op.timeSlot = timeChoice;
-				pushStack(opStack, op);
-
-				sprintf_s(logKey, sizeof(logKey), "LOG%d", logCounter++);
-				sprintf_s(logMsg, sizeof(logMsg), "Booked meeting on %s for Student ID %d at %d", dates[dateChoice], studentID, timeChoice);
-				insertKVP(logList, logKey, logMsg);
+			if (dateChoice == -1) {
+				break;
 			}
+
+			Queue* q = ht[dateChoice].meetingQueue;
+			timeChoice = getValidTimeSlot(q);
+			if (timeChoice == -1) {
+				break;
+			}
+			getValidUserInput(&studentID, name, title);
+			insertMeeting(ht, dates[dateChoice], studentID, name, title, timeChoice);
+			// Create operation record for booking
+
+			op.type = OP_BOOK;
+			strcpy_s(op.date, MAX_DATE_LENGTH, dates[dateChoice]);
+			op.studentID = studentID;
+			strcpy_s(op.name, MAX_NAME_LENGTH, name);
+			strcpy_s(op.title, MAX_TITLE_LENGTH, title);
+			op.timeSlot = timeChoice;
+			pushStack(opStack, op);
+
+			sprintf_s(logKey, sizeof(logKey), "LOG%d", logCounter++);
+			sprintf_s(logMsg, sizeof(logMsg), "Booked meeting on %s for Student ID %d at %d", dates[dateChoice], studentID, timeChoice);
+			insertKVP(logList, logKey, logMsg);
 			break;
 		case CANCEL:
 			dateChoice = getValidDateChoice();
-			if (dateChoice == -1)
+			if (dateChoice == -1) {
 				break;
+			}
+
 			printf("Enter Student ID: ");
 			studentID = getUserInput();
 			

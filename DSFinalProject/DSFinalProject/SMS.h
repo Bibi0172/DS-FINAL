@@ -76,7 +76,7 @@ Operation* cancelMeeting(HashTable* ht, char* date, int studentID);
 
 void searchMeeting(HashTable* ht, char* date, int studentID);
 void viewUpcomingMeetings(HashTable* ht);
-void freeAllDataStructures(HashTable* meetingTable);
+void freeMeetingTable(HashTable* meetingTable);
 
 // Undoing operations:
 int removeMeeting(HashTable* ht, Operation* op);

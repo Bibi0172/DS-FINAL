@@ -2,16 +2,15 @@
 
 int main() {
 	HashTable meetingTable[TOTAL_DAYS];
-	initializeHashTable(meetingTable);
-
 	OperationStack opStack;
-	initStack(&opStack);
-
 	KVP* logList = NULL;
+
+	initializeHashTable(meetingTable);
+	initStack(&opStack);
 
 	displayMenu(meetingTable, &opStack, &logList);
 
-	freeAllDataStructures(meetingTable);
+	freeMeetingTable(meetingTable);
 	freeStack(&opStack);
 	freeKVP(logList);
 

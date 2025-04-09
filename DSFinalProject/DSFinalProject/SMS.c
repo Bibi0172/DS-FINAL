@@ -215,7 +215,7 @@ void viewUpcomingMeetings(HashTable* ht) {
 }
 
 // Free all dynamic memory
-void freeAllDataStructures(HashTable* meetingTable) {
+void freeMeetingTable(HashTable* meetingTable) {
 	if (meetingTable == NULL) {
 		return;
 	}
