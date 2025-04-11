@@ -4,6 +4,9 @@
 #include "SMS.h"
 
 #define MAX_MEETING_SLOT_COUNT	3
+#define LOG_KEY_LENGHT	10
+#define MAX_LOG_LENGTH	150
+#define MAX_BUFFER_SIZE	50
 
 typedef enum {
 	BOOK = 1,

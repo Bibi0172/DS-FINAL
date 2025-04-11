@@ -4,16 +4,16 @@
 
 static int logCounter = 1;
 
-void displayMenu(HashTable* ht, OperationStack* opStack, KVP** logList) {
+void displayMenu(HashTable* ht, OperationStack* operationStack, KVP** logList) {
 	if (ht == NULL) {
 		printf("Error: Invalid hash table\n");
 		return;
 	}
 
-	int choice = 0, studentID = 0, dateChoice = 0, timeChoice = 0;
+	int menuNum = 0, studentID = 0, dateChoice = 0, timeChoice = 0;
 	char name[MAX_NAME_LENGTH] = "", title[MAX_TITLE_LENGTH] = "";
+	char logKey[LOG_KEY_LENGHT] = "", logMsg[MAX_LOG_LENGTH] = "";
 	Operation op = { 0 };
-	char logKey[10], logMsg[150];
 
 	do {
 		printf("\n===========================================\n");
@@ -21,16 +21,16 @@ void displayMenu(HashTable* ht, OperationStack* opStack, KVP** logList) {
 		printf("===========================================\n");
 		printf("1. Book Meeting\n2. Cancel Meeting\n3. Search Meeting\n4. View Upcoming Meetings\n5. Undo Last Operation\n6. Display Operation Log\n7. Exit\n");
 
-		choice = validMenuChoice(7);
-		switch (choice) {
+		menuNum = validMenuChoice(7);
+		switch (menuNum) {
 		case BOOK:
 			dateChoice = getValidDateChoice();
 			if (dateChoice == -1) {
 				break;
 			}
 
-			Queue* q = ht[dateChoice].meetingQueue;
-			timeChoice = getValidTimeSlot(q);
+			Queue* queue = ht[dateChoice].meetingQueue;
+			timeChoice = getValidTimeSlot(queue);
 			if (timeChoice == -1) {
 				break;
 			}
@@ -44,7 +44,7 @@ void displayMenu(HashTable* ht, OperationStack* opStack, KVP** logList) {
 			strcpy_s(op.name, MAX_NAME_LENGTH, name);
 			strcpy_s(op.title, MAX_TITLE_LENGTH, title);
 			op.timeSlot = timeChoice;
-			pushStack(opStack, op);
+			pushStack(operationStack, op);
 
 			sprintf_s(logKey, sizeof(logKey), "LOG%d", logCounter++);
 			sprintf_s(logMsg, sizeof(logMsg), "Booked meeting on %s for Student ID %d at %d", dates[dateChoice], studentID, timeChoice);
@@ -61,7 +61,7 @@ void displayMenu(HashTable* ht, OperationStack* opStack, KVP** logList) {
 			
 			Operation* op = cancelMeeting(ht, dates[dateChoice], studentID);
 			if (op != NULL) {
-				pushStack(opStack, *op);
+				pushStack(operationStack, *op);
 				sprintf_s(logKey, sizeof(logKey), "LOG%d", logCounter++);
 				sprintf_s(logMsg, sizeof(logMsg), "Canceled meeting on %s for Student ID %d", dates[dateChoice], studentID);
 				insertKVP(logList, logKey, logMsg);
@@ -81,7 +81,7 @@ void displayMenu(HashTable* ht, OperationStack* opStack, KVP** logList) {
 			viewUpcomingMeetings(ht);
 			break;
 		case UNDO:
-			undoLastOperation(ht, opStack, logList);
+			undoLastOperation(ht, operationStack, logList);
 			break;
 		case DISPLAY_LOG:
 			displayKVPLog(*logList);
@@ -90,11 +90,12 @@ void displayMenu(HashTable* ht, OperationStack* opStack, KVP** logList) {
 			printf("Exiting... Goodbye!\n");
 			break;
 		}
-	} while (choice != EXIT_PROGRAM);
+	} while (menuNum != EXIT_PROGRAM);
 }
 
 int validMenuChoice(int maxNumber) {
-	int choice;
+	int choice = 0;
+
 	while (1) {
 		printf("Enter your choice: ");
 		choice = getUserInput();
@@ -107,12 +108,13 @@ int validMenuChoice(int maxNumber) {
 }
 
 void cleanBuffer() {
-	int c;
-	while ((c = getchar()) != '\n' && c != EOF);
+	int extraChar = 0;
+	while ((extraChar = getchar()) != '\n' && extraChar != EOF);
 }
 
 int getValidDateChoice() {
 	int choice = 0;
+
 	while (1) {  // Loop until valid input is provided
 		printf("\nAvailable Dates:\n");
 		for (int i = 0; i < TOTAL_DAYS; i++) {
@@ -133,20 +135,20 @@ int getValidDateChoice() {
 	}
 }
 
-int getValidTimeSlot(Queue* q) {
-	if (q == NULL) {
+int getValidTimeSlot(Queue* queue) {
+	if (queue == NULL) {
 		printf("Error: Invalid queue\n");
 		return -1;
 	}
 
-	int choice;
+	int choice = 0;
 	int timeSlots[MAX_MEETING_SLOT_COUNT] = { 1000, 1100, 1200 };
 
 	while (1) {  // Loop until valid time slot is chosen
 		printf("\nAvailable Time Slots:\n");
 		for (int i = 0; i < MAX_MEETING_SLOT_COUNT; i++) {
 			printf("%d. %d AM - %s\n", i + 1, timeSlots[i] / 100,
-				isTimeSlotBooked(q, timeSlots[i]) ? "Booked" : "Available");
+				isTimeSlotBooked(queue, timeSlots[i]) ? "Booked" : "Available");
 		}
 		printf("Enter -1 to return to the main menu.\n");
 
@@ -162,7 +164,7 @@ int getValidTimeSlot(Queue* q) {
 			int selectedTime = timeSlots[choice - 1];
 
 			// Check if the selected time slot is booked
-			if (isTimeSlotBooked(q, selectedTime)) {
+			if (isTimeSlotBooked(queue, selectedTime)) {
 				printf("That time slot is already booked. Please try another.\n");
 			}
 			else {
@@ -175,12 +177,12 @@ int getValidTimeSlot(Queue* q) {
 	}
 }
 
-int isTimeSlotBooked(Queue* q, int time) {
-	if (q == NULL) {
+int isTimeSlotBooked(Queue* queue, int time) {
+	if (queue == NULL) {
 		return 0;
 	}
 
-	Meeting* temp = q->front;
+	Meeting* temp = queue->front;
 	while (temp != NULL) {
 		if (temp->time == time) {
 			return 1;
@@ -211,22 +213,22 @@ void getValidUserInput(int* studentID, char* name, char* title) {
 
 void undoLastOperation(HashTable* ht, OperationStack* opStack, KVP** logList) {
 	Operation op;
-	char logKey[10], logMsg[150];
+	char logKey[LOG_KEY_LENGHT] = "", logMsg[MAX_LOG_LENGTH] = "";
 
 	if (!popStack(opStack, &op)) {
-		printf("No operations to undo.\n");
+		printf("\nNo operations to undo.\n");
 		return;
 	}
 
 	if (op.type == OP_BOOK) {
 		if (removeMeeting(ht, &op)) {
-			printf("Undo booking: Meeting for Student ID %d on %s at %d has been removed.\n", op.studentID, op.date, op.timeSlot);
+			printf("\nUndo booking: Meeting for Student ID %d on %s at %d has been removed.\n", op.studentID, op.date, op.timeSlot);
 			sprintf_s(logKey, sizeof(logKey), "LOG%d", logCounter++);
 			sprintf_s(logMsg, sizeof(logMsg), "Undid booking for Student ID %d on %s at %d", op.studentID, op.date, op.timeSlot);
 			insertKVP(logList, logKey, logMsg);
 		}
 		else {
-			printf("Undo booking failed: Meeting not found.\n");
+			printf("\nUndo booking failed: Meeting not found.\n");
 		}
 	}
 	else if (op.type == OP_CANCEL) {
@@ -244,10 +246,10 @@ void undoLastOperation(HashTable* ht, OperationStack* opStack, KVP** logList) {
 
 // Safely read a number from stdin
 int getUserInput() {
-	char buffer[50];
+	char buffer[MAX_BUFFER_SIZE] = "";
 
 	if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
-		int value;
+		int value = 0;
 		if (sscanf_s(buffer, "%d", &value) == 1)
 			return value;
 	}
@@ -257,7 +259,7 @@ int getUserInput() {
 
 void displayKVPLog(KVP* operationLog) {
 	if (operationLog == NULL) {
-		printf("Operation log is empty.\n");
+		printf("\nOperation log is empty.\n");
 		return;
 	}
 	printf("Operation Log:\n");

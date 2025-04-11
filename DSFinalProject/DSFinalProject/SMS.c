@@ -54,10 +54,10 @@ void insertMeeting(HashTable* ht, char* date, int studentID, char* name, char* t
 		printf("Invalid date! Please choose a valid date.\n");
 		return;
 	}
-	Queue* q = ht[index].meetingQueue;
+	Queue* queue = ht[index].meetingQueue;
 
 	// Check if time slot is already taken
-	Meeting* current = q->front;
+	Meeting* current = queue->front;
 	while (current != NULL) {
 		if (current->time == time) {
 			printf("The %d time slot is already booked on %s. Please choose a different time.\n", time, date);
@@ -67,7 +67,7 @@ void insertMeeting(HashTable* ht, char* date, int studentID, char* name, char* t
 	}
 
 	// Check if maximum slots are reached
-	if (q->count >= MAX_SLOTS) {
+	if (queue->count >= MAX_SLOTS) {
 		printf("All slots are booked for %s. Please choose a different date.\n", date);
 		return;
 	}
@@ -87,14 +87,14 @@ void insertMeeting(HashTable* ht, char* date, int studentID, char* name, char* t
 	newMeeting->next = NULL;
 
 	// Enqueue in FIFO order
-	if (q->back == NULL) {
-		q->front = q->back = newMeeting;
+	if (queue->back == NULL) {
+		queue->front = queue->back = newMeeting;
 	}
 	else {
-		q->back->next = newMeeting;
-		q->back = newMeeting;
+		queue->back->next = newMeeting;
+		queue->back = newMeeting;
 	}
-	q->count++;
+	queue->count++;
 
 	printf("Meeting booked successfully on %s for Student ID %d at %d.\n", date, studentID, time);
 }
@@ -111,13 +111,13 @@ Operation* cancelMeeting(HashTable* ht, char* date, int studentID) {
 		return NULL;
 	}
 	
-	Queue* q = ht[index].meetingQueue;
-	if (q->front == NULL) {
-		printf("No meetings found on %s.\n", date);
+	Queue* queue = ht[index].meetingQueue;
+	if (queue->front == NULL) {
+		printf("\nNo meetings found on %s.\n", date);
 		return NULL;
 	}
 
-	Meeting* temp = q->front;
+	Meeting* temp = queue->front;
 	Meeting* prev = NULL;
 	while (temp != NULL && temp->studentID != studentID) {
 		prev = temp;
@@ -145,19 +145,19 @@ Operation* cancelMeeting(HashTable* ht, char* date, int studentID) {
 	
 	// Remove node from the queue
 	if (prev == NULL) {  // Removing the first node
-		q->front = temp->next;
+		queue->front = temp->next;
 	}
 	else {
 		prev->next = temp->next;
 	}
 	
-	if (q->back == temp) {
-		q->back = prev;
+	if (queue->back == temp) {
+		queue->back = prev;
 	}
 	
 	free(temp);
 	
-	q->count--;
+	queue->count--;
 	printf("Meeting canceled for Student ID %d on %s.\n", studentID, date);
 	return op;
 }
@@ -174,18 +174,17 @@ void searchMeeting(HashTable* ht, char* date, int studentID) {
 		return;
 	}
 
-	Queue* q = ht[index].meetingQueue;
-	Meeting* temp = q->front;
-	while (temp != NULL) {
-		if (temp->studentID == studentID) {
+	Meeting* current = ht[index].meetingQueue->front;
+	while (current != NULL) {
+		if (current->studentID == studentID) {
 			printf("Meeting Found!\nDate: %s\nStudent: %s\nTitle: %s\nTime: %d\n",
-				date, temp->name, temp->title, temp->time);
+				date, current->name, current->title, current->time);
 			return;
 		}
-		temp = temp->next;
+		current = current->next;
 	}
 
-	printf("No meeting found for Student ID %d on %s.\n", studentID, date);
+	printf("\nNo meeting found for Student ID %d on %s.\n", studentID, date);
 }
 
 void viewUpcomingMeetings(HashTable* ht) {
@@ -196,18 +195,18 @@ void viewUpcomingMeetings(HashTable* ht) {
 
 	printf("\nUpcoming Meetings:\n");
 	for (int i = 0; i < TOTAL_DAYS; i++) {
-		Queue* q = ht[i].meetingQueue;
-		Meeting* temp = q->front;
+		Queue* queue = ht[i].meetingQueue;
+		Meeting* current = queue->front;
 
-		printf("Date: %s - %s\n", ht[i].date, (q->count >= MAX_SLOTS) ? " Full" : " Available");
-		if (temp == NULL) {
+		printf("Date: %s - %s\n", ht[i].date, (queue->count >= MAX_SLOTS) ? " Full" : " Available");
+		if (current == NULL) {
 			printf("  - No meetings scheduled\n");
 		}
 		else {
-			while (temp != NULL) {
+			while (current != NULL) {
 				printf("  - Student: %s (ID: %d) | Title: %s | Time: %d\n",
-					temp->name, temp->studentID, temp->title, temp->time);
-				temp = temp->next;
+					current->name, current->studentID, current->title, current->time);
+				current = current->next;
 			}
 		}
 		printf("\n");
@@ -221,17 +220,17 @@ void freeMeetingTable(HashTable* meetingTable) {
 	}
 
 	for (int i = 0; i < TOTAL_DAYS; i++) {
-		Queue* q = meetingTable[i].meetingQueue;
-		if (q != NULL) {
+		Queue* queue = meetingTable[i].meetingQueue;
+		if (queue != NULL) {
 			// Free all meeting nodes in Queue
-			Meeting* current = q->front;
+			Meeting* current = queue->front;
 			while (current != NULL) {
 				Meeting* next = current->next;
 				free(current);
 				current = next;
 			}
 			// Free Queue
-			free(q);
+			free(queue);
 			meetingTable[i].meetingQueue = NULL;
 		}
 	}
@@ -245,22 +244,22 @@ int removeMeeting(HashTable* ht, Operation* op) {
 		return 0;
 	}
 
-	Queue* q = ht[index].meetingQueue;
-	Meeting* temp = q->front;
+	Queue* queue = ht[index].meetingQueue;
+	Meeting* temp = queue->front;
 	Meeting* prev = NULL;
 	while (temp != NULL) {
 		if (temp->studentID == op->studentID && temp->time == op->timeSlot) {
 			if (prev == NULL) {
-				q->front = temp->next;
+				queue->front = temp->next;
 			}
 			else {
 				prev->next = temp->next;
 			}
-			if (q->back == temp) {
-				q->back = prev;
+			if (queue->back == temp) {
+				queue->back = prev;
 			}
 			free(temp);
-			q->count--;
+			queue->count--;
 			return 1;
 		}
 		prev = temp;
@@ -277,9 +276,9 @@ int reinsertMeeting(HashTable* ht, Operation* op) {
 		return 0;
 	}
 
-	Queue* q = ht[index].meetingQueue;
+	Queue* queue = ht[index].meetingQueue;
 	
-	if (q->count >= MAX_SLOTS) {
+	if (queue->count >= MAX_SLOTS) {
 		printf("Cannot undo cancellation: All slots are filled for %s.\n", op->date);
 		return 0;
 	}
@@ -297,15 +296,15 @@ int reinsertMeeting(HashTable* ht, Operation* op) {
 	newMeeting->time = op->timeSlot;
 	newMeeting->next = NULL;
 	// Enqueue the meeting node
-	if (q->back == NULL) {
-		q->front = q->back = newMeeting;
+	if (queue->back == NULL) {
+		queue->front = queue->back = newMeeting;
 	}
 	else {
-		q->back->next = newMeeting;
-		q->back = newMeeting;
+		queue->back->next = newMeeting;
+		queue->back = newMeeting;
 	}
 
-	q->count++;
+	queue->count++;
 	return 1;
 }
 void initStack(OperationStack* stack) {
