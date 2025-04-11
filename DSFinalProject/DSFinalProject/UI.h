@@ -12,6 +12,7 @@ typedef enum {
 	VIEW,
 	UNDO,
 	DISPLAY_LOG,
+	VIEW_HISTORY,
 	EXIT_PROGRAM,
 } KIND_OF_MENU;
 

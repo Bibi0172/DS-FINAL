@@ -19,7 +19,7 @@ void displayMenu(HashTable* ht, OperationStack* opStack, KVP** logList) {
 		printf("\n===========================================\n");
 		printf("          Student Meeting Scheduler        \n");
 		printf("===========================================\n");
-		printf("1. Book Meeting\n2. Cancel Meeting\n3. Search Meeting\n4. View Upcoming Meetings\n5. Undo Last Operation\n6. Display Operation Log\n7. Exit\n");
+		printf("1. Book Meeting\n2. Cancel Meeting\n3. Search Meeting\n4. View Upcoming Meetings\n5. Undo Last Operation\n6. Display Operation Log\n7. View Meeting History\n 8.Exit\n");
 
 		choice = validMenuChoice(7);
 		switch (choice) {
@@ -82,6 +82,9 @@ void displayMenu(HashTable* ht, OperationStack* opStack, KVP** logList) {
 			break;
 		case UNDO:
 			undoLastOperation(ht, opStack, logList);
+			break;
+		case VIEW_HISTORY:
+			viewMeetingHistory();
 			break;
 		case DISPLAY_LOG:
 			displayKVPLog(*logList);
