@@ -1,4 +1,4 @@
-﻿#include "UI.h"
+#include "UI.h"
 
 void displayMenu(HashTable* ht) {
     int choice, studentID, dateChoice, timeChoice;
