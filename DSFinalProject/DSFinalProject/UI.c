@@ -20,7 +20,7 @@ void displayMenu(HashTable* ht, OperationStack* operationStack, KVP** logList, P
 		printf("\n===========================================\n");
 		printf("          Student Meeting Scheduler        \n");
 		printf("===========================================\n");
-		printf("1. Book Meeting\n2. Cancel Meeting\n3. Search Meeting\n4. View Upcoming Meetings\n5. Undo Last Operation\n6. Display Operation Log\n7. View Meeting History\n8. Process Completed Meetings\n9. View Processed Meetings\n10.Exit\n");
+		printf("1. Book Meeting\n2. Cancel Meeting\n3. Search Meeting\n4. View Upcoming Meetings\n5. Undo Last Operation\n6. Display Operation Log\n7. View Meeting History\n8. Process Completed Meetings\n9. View Processed Meetings\n 10.Exit\n");
 
 		menuNum = validMenuChoice(10);
 		switch (menuNum) {

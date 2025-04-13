@@ -33,9 +33,9 @@ int isDuplicateName(HashTable* ht, const char* name);
 int isDuplicateID(HashTable* ht, int studentID);
 int isTimeSlotBooked(Queue* q, int time);
 
+
 void undoLastOperation(HashTable* ht, OperationStack* opStack, KVP** logList);
 void displayKVPLog(KVP* operationLog);
-
 int getUserInput();
 
 #endif

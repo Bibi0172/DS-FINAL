@@ -477,7 +477,8 @@ int popProcessedMeeting(ProcessedMeetingStack* stack, Meeting* meeting, char* da
 }
 
 // Process completed meetings based on current date
-void processCompletedMeetings(HashTable* ht, ProcessedMeetingStack* stack, char* currentDate) {
+void processCompletedMeetings(HashTable* ht, ProcessedMeetingStack* stack, char* currentDate)
+{
 	if (ht == NULL || stack == NULL || currentDate == NULL) {
 		printf("Error: Invalid parameters for processing meetings\n");
 		return;
@@ -486,9 +487,11 @@ void processCompletedMeetings(HashTable* ht, ProcessedMeetingStack* stack, char*
 	int processedCount = 0;
 
 	// Iterate through all dates in the schedule
-	for (int i = 0; i < TOTAL_DAYS; i++) {
+	for (int i = 0; i < TOTAL_DAYS; i++) 
+	{
 		// Skip if the date is today or in the future
-		if (strcmp(ht[i].date, currentDate) >= 0) {
+		if (strcmp(ht[i].date, currentDate) >= 0)
+		{
 			continue;  // Skip dates that haven't passed
 		}
 
@@ -537,8 +540,10 @@ void processCompletedMeetings(HashTable* ht, ProcessedMeetingStack* stack, char*
 }
 
 // View processed meetings in stack (most recent first)
-void viewProcessedMeetings(ProcessedMeetingStack* stack) {
-	if (stack == NULL || stack->Top == NULL) {
+void viewProcessedMeetings(ProcessedMeetingStack* stack)
+{
+	if (stack == NULL || stack->Top == NULL)
+	{
 		printf("No processed meetings in stack.\n");
 		return;
 	}
@@ -547,14 +552,15 @@ void viewProcessedMeetings(ProcessedMeetingStack* stack) {
 	ProcessedMeetingNode* current = stack->Top;
 	int count = 1;
 
-	while (current != NULL) {
+	while (current != NULL)
+	{
 		Meeting meeting = current->data;
 
 		printf("\n[%d] Meeting:\n", count++);
-		printf("Date        : %s\n", current->date);
-		printf("Student     : %s (ID: %d)\n", meeting.name, meeting.studentID);
-		printf("Title       : %s\n", meeting.title);
-		printf("Time        : %d\n", meeting.time);
+		printf("Date      : %s\n", current->date);
+		printf("Student   : %s (ID: %d)\n", meeting.name, meeting.studentID);
+		printf("Title     : %s\n", meeting.title);
+		printf("Time      : %d\n", meeting.time);
 		printf("------------------------\n");
 
 		current = current->NextNode;
@@ -562,10 +568,12 @@ void viewProcessedMeetings(ProcessedMeetingStack* stack) {
 }
 
 // Free memory used by processed meeting stack
-void freeProcessedStack(ProcessedMeetingStack* stack) {
+void freeProcessedStack(ProcessedMeetingStack* stack) 
+{
 	ProcessedMeetingNode* current = stack->Top;
 
-	while (current != NULL) {
+	while (current != NULL)
+	{
 		ProcessedMeetingNode* temp = current;
 		current = current->NextNode;
 		free(temp);
