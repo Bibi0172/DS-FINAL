@@ -18,10 +18,12 @@ typedef enum {
 	UNDO,
 	DISPLAY_LOG,
 	VIEW_HISTORY,
+	PROCESS_MEETINGS,
+	VIEW_PROCESSED,
 	EXIT_PROGRAM,
 } KIND_OF_MENU;
 
-void displayMenu(HashTable* ht, OperationStack* opStack, KVP** logList);
+void displayMenu(HashTable* ht, OperationStack* opStack, KVP** logList, ProcessedMeetingStack* processedStack);
 int validMenuChoice(int maxNumber);
 void cleanBuffer();
 int getValidDateChoice();

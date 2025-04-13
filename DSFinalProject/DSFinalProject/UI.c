@@ -5,7 +5,7 @@
 
 static int logCounter = 1;
 
-void displayMenu(HashTable* ht, OperationStack* operationStack, KVP** logList) {
+void displayMenu(HashTable* ht, OperationStack* operationStack, KVP** logList, ProcessedMeetingStack* processedStack) {
 	if (ht == NULL) {
 		printf("Error: Invalid hash table\n");
 		return;
@@ -20,9 +20,9 @@ void displayMenu(HashTable* ht, OperationStack* operationStack, KVP** logList) {
 		printf("\n===========================================\n");
 		printf("          Student Meeting Scheduler        \n");
 		printf("===========================================\n");
-		printf("1. Book Meeting\n2. Cancel Meeting\n3. Search Meeting\n4. View Upcoming Meetings\n5. Undo Last Operation\n6. Display Operation Log\n7. View Meeting History\n 8.Exit\n");
+		printf("1. Book Meeting\n2. Cancel Meeting\n3. Search Meeting\n4. View Upcoming Meetings\n5. Undo Last Operation\n6. Display Operation Log\n7. View Meeting History\n8. Process Completed Meetings\n9. View Processed Meetings\n10.Exit\n");
 
-		menuNum = validMenuChoice(7);
+		menuNum = validMenuChoice(10);
 		switch (menuNum) {
 		case BOOK:
 			dateChoice = getValidDateChoice();
@@ -90,6 +90,39 @@ void displayMenu(HashTable* ht, OperationStack* operationStack, KVP** logList) {
 		case DISPLAY_LOG:
 			displayKVPLog(*logList);
 			break;
+		case PROCESS_MEETINGS: {
+			char currentDate[MAX_DATE_LENGTH];
+			printf("\nEnter current date (e.g., 'May 3'): ");
+			if (fgets(currentDate, MAX_DATE_LENGTH, stdin) != NULL) {
+				currentDate[strcspn(currentDate, "\n")] = '\0';
+
+				// Validate date format
+				int validDate = 0;
+				for (int i = 0; i < TOTAL_DAYS; i++) {
+					if (strcmp(dates[i], currentDate) == 0) {
+						validDate = 1;
+						break;
+					}
+				}
+
+				if (validDate) {
+					processCompletedMeetings(ht, processedStack, currentDate);
+
+					sprintf_s(logKey, sizeof(logKey), "LOG%d", logCounter++);
+					sprintf_s(logMsg, sizeof(logMsg), "Processed completed meetings for date %s", currentDate);
+					insertKVP(logList, logKey, logMsg);
+				}
+				else {
+					printf("Invalid date format. Please use format 'May X' where X is 1-7.\n");
+				}
+			}
+			break;
+		}
+		case VIEW_PROCESSED:
+			viewProcessedMeetings(processedStack);
+			break;
+
+
 		case EXIT_PROGRAM:
 			printf("Exiting... Goodbye!\n");
 			break;

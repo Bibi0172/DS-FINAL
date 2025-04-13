@@ -106,13 +106,13 @@ Operation* cancelMeeting(HashTable* ht, char* date, int studentID) {
 		printf("Error: Invalid parameters for cancellation\n");
 		return NULL;
 	}
-	
+
 	int index = findHashIndex(ht, date);
 	if (index == -1) {
 		printf("Invalid date! Please enter a valid date.\n");
 		return NULL;
 	}
-	
+
 	Queue* queue = ht[index].meetingQueue;
 	if (queue->front == NULL) {
 		printf("\nNo meetings found on %s.\n", date);
@@ -125,26 +125,26 @@ Operation* cancelMeeting(HashTable* ht, char* date, int studentID) {
 		prev = temp;
 		temp = temp->next;
 	}
-	
+
 	if (temp == NULL) {
 		printf("No meeting found for Student ID %d on %s.\n", studentID, date);
 		return NULL;
 	}
-	
+
 	// Allocate an Operation record to save details for undo (cancellation operation)
 	Operation* op = (Operation*)malloc(sizeof(Operation));
 	if (op == NULL) {
 		printf("Failed to allocate memory for operation record.\n");
 		return NULL;
 	}
-	
+
 	op->type = OP_CANCEL;
 	strcpy_s(op->date, MAX_DATE_LENGTH, date);
 	op->studentID = temp->studentID;
 	strcpy_s(op->name, MAX_NAME_LENGTH, temp->name);
 	strcpy_s(op->title, MAX_TITLE_LENGTH, temp->title);
 	op->timeSlot = temp->time;
-	
+
 	// Remove node from the queue
 	if (prev == NULL) {  // Removing the first node
 		queue->front = temp->next;
@@ -152,13 +152,13 @@ Operation* cancelMeeting(HashTable* ht, char* date, int studentID) {
 	else {
 		prev->next = temp->next;
 	}
-	
+
 	if (queue->back == temp) {
 		queue->back = prev;
 	}
-	
+
 	free(temp);
-	
+
 	queue->count--;
 	printf("Meeting canceled for Student ID %d on %s.\n", studentID, date);
 	return op;
@@ -241,7 +241,7 @@ void freeMeetingTable(HashTable* meetingTable) {
 // Remove a meeting matching details from an operation record (used for undo of booking)
 int removeMeeting(HashTable* ht, Operation* op) {
 	int index = findHashIndex(ht, op->date);
-	
+
 	if (index == -1) {
 		return 0;
 	}
@@ -273,13 +273,13 @@ int removeMeeting(HashTable* ht, Operation* op) {
 // Reinsert a meeting from an operation record (used for undo of cancellation)
 int reinsertMeeting(HashTable* ht, Operation* op) {
 	int index = findHashIndex(ht, op->date);
-	
+
 	if (index == -1) {
 		return 0;
 	}
 
 	Queue* queue = ht[index].meetingQueue;
-	
+
 	if (queue->count >= MAX_SLOTS) {
 		printf("Cannot undo cancellation: All slots are filled for %s.\n", op->date);
 		return 0;
@@ -287,7 +287,7 @@ int reinsertMeeting(HashTable* ht, Operation* op) {
 
 	// Create a new meeting node from op details
 	Meeting* newMeeting = (Meeting*)malloc(sizeof(Meeting));
-	
+
 	if (newMeeting == NULL) {
 		return 0;
 	}
@@ -366,7 +366,7 @@ bool isStackEmpty(OperationStack* stack) {
 
 void pushStack(OperationStack* stack, Operation op) {
 	StackNode* newNode = (StackNode*)malloc(sizeof(StackNode));
-	
+
 	if (newNode == NULL) {
 		printf("Stack: Unable to allocate memory for new operation.\n");
 		return;
@@ -382,35 +382,35 @@ int popStack(OperationStack* stack, Operation* op) {
 	{
 		return 0;
 	}
-	
+
 	StackNode* temp = stack->top;
 	*op = temp->op;
 	stack->top = temp->next;
 	free(temp);
-	
+
 	return 1;
 }
 
 void freeStack(OperationStack* stack) {
 	StackNode* current = stack->top;
-	
+
 	while (current != NULL) {
 		StackNode* temp = current;
 		current = current->next;
 		free(temp);
 	}
-	
+
 	stack->top = NULL;
 }
 
 void insertKVP(KVP** head, char* key, char* value) {
 	KVP* newNode = (KVP*)malloc(sizeof(KVP));
-	
+
 	if (newNode == NULL) {
 		printf("Failed to allocate memory for KVP node.\n");
 		return;
 	}
-	
+
 	strcpy_s(newNode->key, MAX_KEY_LENGTH_KVP, key);
 	strcpy_s(newNode->value, MAX_VALUE_LENGTH_KVP, value);
 	newNode->next = *head;
@@ -432,4 +432,144 @@ void freeKVP(KVP* head) {
 		head = head->next;
 		free(temp);
 	}
+}
+
+
+
+
+
+// Initialize the processed meeting stack
+void initProcessedStack(ProcessedMeetingStack* stack) {
+	stack->Top = NULL;
+}
+
+// Push a processed meeting onto the stack
+void pushProcessedMeeting(ProcessedMeetingStack* stack, Meeting meeting, char* date) {
+	ProcessedMeetingNode* newNode = (ProcessedMeetingNode*)malloc(sizeof(ProcessedMeetingNode));
+
+	if (newNode == NULL) {
+		printf("Failed to allocate memory for processed meeting.\n");
+		return;
+	}
+
+	// Copy meeting data
+	newNode->data = meeting;
+	strcpy_s(newNode->date, MAX_DATE_LENGTH, date);
+
+	// Add to top of stack
+	newNode->NextNode = stack->Top;
+	stack->Top = newNode;
+}
+
+// Pop a processed meeting from the stack
+int popProcessedMeeting(ProcessedMeetingStack* stack, Meeting* meeting, char* date) {
+	if (stack->Top == NULL) {
+		return 0;  // Stack is empty
+	}
+
+	ProcessedMeetingNode* temp = stack->Top;
+	*meeting = temp->data;
+	strcpy_s(date, MAX_DATE_LENGTH, temp->date);
+
+	stack->Top = temp->NextNode;
+	free(temp);
+	return 1;
+}
+
+// Process completed meetings based on current date
+void processCompletedMeetings(HashTable* ht, ProcessedMeetingStack* stack, char* currentDate) {
+	if (ht == NULL || stack == NULL || currentDate == NULL) {
+		printf("Error: Invalid parameters for processing meetings\n");
+		return;
+	}
+
+	int processedCount = 0;
+
+	// Iterate through all dates in the schedule
+	for (int i = 0; i < TOTAL_DAYS; i++) {
+		// Skip if the date is today or in the future
+		if (strcmp(ht[i].date, currentDate) >= 0) {
+			continue;  // Skip dates that haven't passed
+		}
+
+		Queue* queue = ht[i].meetingQueue;
+		Meeting* current = queue->front;
+		Meeting* prev = NULL;
+
+		// Process all meetings for this past date
+		while (current != NULL) {
+			// Save the next pointer before removing the current node
+			Meeting* next = current->next;
+
+			// Add to processed stack
+			pushProcessedMeeting(stack, *current, ht[i].date);
+
+			// Also add to history (connecting with existing functionality)
+			addToHistory(*current);
+
+			processedCount++;
+
+			// Remove from queue
+			if (prev == NULL) {
+				queue->front = next;
+			}
+			else {
+				prev->next = next;
+			}
+
+			if (queue->back == current) {
+				queue->back = prev;
+			}
+
+			free(current);
+			queue->count--;
+
+			current = next;
+		}
+	}
+
+	if (processedCount > 0) {
+		printf("Processed %d meetings.\n", processedCount);
+	}
+	else {
+		printf("No meetings to process.\n");
+	}
+}
+
+// View processed meetings in stack (most recent first)
+void viewProcessedMeetings(ProcessedMeetingStack* stack) {
+	if (stack == NULL || stack->Top == NULL) {
+		printf("No processed meetings in stack.\n");
+		return;
+	}
+
+	printf("\n===== Processed Meeting History (Latest First) =====\n");
+	ProcessedMeetingNode* current = stack->Top;
+	int count = 1;
+
+	while (current != NULL) {
+		Meeting meeting = current->data;
+
+		printf("\n[%d] Meeting:\n", count++);
+		printf("Date        : %s\n", current->date);
+		printf("Student     : %s (ID: %d)\n", meeting.name, meeting.studentID);
+		printf("Title       : %s\n", meeting.title);
+		printf("Time        : %d\n", meeting.time);
+		printf("------------------------\n");
+
+		current = current->NextNode;
+	}
+}
+
+// Free memory used by processed meeting stack
+void freeProcessedStack(ProcessedMeetingStack* stack) {
+	ProcessedMeetingNode* current = stack->Top;
+
+	while (current != NULL) {
+		ProcessedMeetingNode* temp = current;
+		current = current->NextNode;
+		free(temp);
+	}
+
+	stack->Top = NULL;
 }

@@ -64,6 +64,7 @@ void addToHistory(Meeting meet);
 
 void viewMeetingHistory(void);
 
+
 // Node for the operation stack
 typedef struct StackNode {
 	Operation op;
@@ -108,5 +109,26 @@ typedef struct KVP {
 void insertKVP(KVP** head, char* key, char* value);
 char* searchKVP(KVP* head, char* key);
 void freeKVP(KVP* head);
+
+//stack structure for processed meetings
+typedef struct ProcessedMeetingNode {
+	Meeting data;  // Reusing the Meeting structure
+	char date[MAX_DATE_LENGTH];  // Store the date too
+	struct ProcessedMeetingNode* NextNode;
+} ProcessedMeetingNode;
+
+typedef struct ProcessedMeetingStack {
+	ProcessedMeetingNode* Top;  // Head of stack
+} ProcessedMeetingStack;
+
+// Function declarations
+void initProcessedStack(ProcessedMeetingStack* stack);
+void pushProcessedMeeting(ProcessedMeetingStack* stack, Meeting meeting, char* date);
+int popProcessedMeeting(ProcessedMeetingStack* stack, Meeting* meeting, char* date);
+void processCompletedMeetings(HashTable* ht, ProcessedMeetingStack* stack, char* currentDate);
+void viewProcessedMeetings(ProcessedMeetingStack* stack);
+void freeProcessedStack(ProcessedMeetingStack* stack);
+
+
 
 #endif
