@@ -5,6 +5,8 @@
 
 // The global array of dates
 char* dates[TOTAL_DAYS] = { "May 1", "May 2", "May 3", "May 4", "May 5", "May 6", "May 7" };
+historyNode* historyHead = NULL;
+
 
 void initializeHashTable(HashTable* ht) {
 	for (int i = 0; i < TOTAL_DAYS; i++) {
@@ -307,6 +309,53 @@ int reinsertMeeting(HashTable* ht, Operation* op) {
 	queue->count++;
 	return 1;
 }
+//Function: addToHistory
+//Description: adds a processed meeting to the end of the history linked list
+//Parameters: Meeting meet
+//Returns none
+void addToHistory(Meeting meet) {
+	historyNode* newNode = (historyNode*)malloc(sizeof(historyNode));
+	newNode->data = meet;
+	newNode->next = NULL;
+
+	//first entry
+	if (historyHead == NULL) {
+		historyHead = newNode;
+	}
+	else {
+		historyNode* current = historyHead;
+		while (current->next != NULL) {
+			current = current->next;
+		}
+		current->next = newNode;
+	}
+}
+//Function: viewMeetingHistory
+//Description: function will display all processed meetings
+//Parameters: None
+//Returns None
+void viewMeetingHistory() {
+	if (historyHead == NULL) {
+		printf("No Meetings have been Processed\n");
+		return;
+	}
+	printf("Processed Meeting History\n");
+	historyNode* current = historyHead;
+	int count = 1;
+
+	while (current != NULL) {
+		Meeting meet = current->data;
+
+		printf("[%d] Meeting: \n", count++);
+		printf("Student     : %s\n", meet.name);
+		printf("ID          : %d\n", meet.studentID);
+		printf("Title       : %s\n", meet.title);
+		printf("Time        : %d\n", meet.time);
+		current = current->next;
+	}
+	printf("\n");
+}
+
 void initStack(OperationStack* stack) {
 	stack->top = NULL;
 }

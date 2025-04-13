@@ -54,6 +54,16 @@ typedef struct Operation {
 	int timeSlot;
 } Operation;
 
+//node for processed meeting history 
+typedef struct historyNode {
+	Meeting data;
+	struct historyNode* next;
+}historyNode;
+
+void addToHistory(Meeting meet);
+
+void viewMeetingHistory(void);
+
 // Node for the operation stack
 typedef struct StackNode {
 	Operation op;
