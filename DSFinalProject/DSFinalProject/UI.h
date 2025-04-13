@@ -7,6 +7,8 @@
 #define LOG_KEY_LENGHT	10
 #define MAX_LOG_LENGTH	150
 #define MAX_BUFFER_SIZE	50
+#define MIN_STUDENT_ID 100000
+#define MAX_STUDENT_ID 999999
 
 typedef enum {
 	BOOK = 1,
@@ -23,7 +25,9 @@ int validMenuChoice(int maxNumber);
 void cleanBuffer();
 int getValidDateChoice();
 int getValidTimeSlot(Queue* q);
-void getValidUserInput(int* studentID, char* name, char* title);
+void getValidUserInput(HashTable* ht, int* studentID, char* name, char* title);
+int isDuplicateName(HashTable* ht, const char* name);
+int isDuplicateID(HashTable* ht, int studentID);
 int isTimeSlotBooked(Queue* q, int time);
 
 void undoLastOperation(HashTable* ht, OperationStack* opStack, KVP** logList);

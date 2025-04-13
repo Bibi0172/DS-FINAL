@@ -1,6 +1,7 @@
 ﻿#include "UI.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>  
 
 static int logCounter = 1;
 
@@ -34,7 +35,7 @@ void displayMenu(HashTable* ht, OperationStack* operationStack, KVP** logList) {
 			if (timeChoice == -1) {
 				break;
 			}
-			getValidUserInput(&studentID, name, title);
+			getValidUserInput(ht, &studentID, name, title);
 			insertMeeting(ht, dates[dateChoice], studentID, name, title, timeChoice);
 			// Create operation record for booking
 
@@ -58,7 +59,7 @@ void displayMenu(HashTable* ht, OperationStack* operationStack, KVP** logList) {
 
 			printf("Enter Student ID: ");
 			studentID = getUserInput();
-			
+
 			Operation* op = cancelMeeting(ht, dates[dateChoice], studentID);
 			if (op != NULL) {
 				pushStack(operationStack, *op);
@@ -93,18 +94,34 @@ void displayMenu(HashTable* ht, OperationStack* operationStack, KVP** logList) {
 	} while (menuNum != EXIT_PROGRAM);
 }
 
-int validMenuChoice(int maxNumber) {
-	int choice = 0;
+int validMenuChoice(int maxNumber)
+{
+	int choice;
 
 	while (1) {
-		printf("Enter your choice: ");
-		choice = getUserInput();
-		if ((choice >= 1 && choice <= maxNumber) || choice == -1) {
-			return choice;
-		}
+		printf("Enter your choice: ");//get valid number between 1 and max menu option
+		if (scanf_s("%d", &choice) == 1 && choice >= 1 && choice <= maxNumber) {
 
-		printf("Invalid Input. Please enter a number between 1 and %d OR -1 to return to menu.\n", maxNumber);
+			if (getchar() == '\n') {  // no extra charachters
+				return choice;
+			}
+		}
+		cleanBuffer();
+		printf("Invalid Input. Please enter a number between 1 and %d.\n", maxNumber);
 	}
+}
+
+// Safely read a number from stdin // NOT SURE WHY WE HAVE THIS 
+int getUserInput() {
+	char buffer[MAX_BUFFER_SIZE] = "";
+
+	if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
+		int value = 0;
+		if (sscanf_s(buffer, "%d", &value) == 1)
+			return value;
+	}
+	cleanBuffer();
+	return -1;
 }
 
 void cleanBuffer() {
@@ -192,23 +209,166 @@ int isTimeSlotBooked(Queue* queue, int time) {
 	return 0;
 }
 
-void getValidUserInput(int* studentID, char* name, char* title) {
-	if (studentID == NULL || name == NULL || title == NULL) {
+int isDuplicateID(HashTable* ht, int studentID) {
+	for (int i = 0; i < TOTAL_DAYS; i++) {
+		Meeting* current = ht[i].meetingQueue->front;
+		while (current != NULL) {
+			if (current->studentID == studentID) {
+				return 1; // Duplicate found
+			}
+			current = current->next;
+		}
+	}
+	return 0; // No duplicate
+}
+
+int isDuplicateName(HashTable* ht, const char* name) {
+	for (int i = 0; i < TOTAL_DAYS; i++) {
+		Meeting* current = ht[i].meetingQueue->front;
+		while (current != NULL) {
+			if (strcmp(current->name, name) == 0) {
+				return 1; // Duplicate found
+			}
+			current = current->next;
+		}
+	}
+	return 0; // No duplicate
+}
+
+void getValidUserInput(HashTable* ht, int* studentID, char* name, char* title) {
+	if (ht == NULL || studentID == NULL || name == NULL || title == NULL) {
 		printf("Error: Invalid input parameters\n");
 		return;
 	}
 
-	printf("Enter Student ID: ");
-	*studentID = getUserInput();
+	// Student ID validation
+	char idInput[50];
+	do {
+		printf("Enter Student ID: ");
+		if (fgets(idInput, sizeof(idInput), stdin) != NULL) {
+			idInput[strcspn(idInput, "\n")] = '\0';
 
-	printf("Enter Name: ");
-	if (fgets(name, MAX_NAME_LENGTH, stdin) != NULL) {
-		name[strcspn(name, "\n")] = '\0';
-	}
-	printf("Enter Meeting Title: ");
-	if (fgets(title, MAX_TITLE_LENGTH, stdin) != NULL) {
-		title[strcspn(title, "\n")] = '\0';
-	}
+			// Check blank input
+			if (strlen(idInput) == 0 || strspn(idInput, " \t") == strlen(idInput)) {
+				printf("Student ID cannot be blank!\n");
+				continue;
+			}
+
+			// Check all digits
+			int allDigits = 1;
+			for (int i = 0; idInput[i] != '\0'; i++) {
+				if (!isdigit(idInput[i])) {
+					allDigits = 0;
+					break;
+				}
+			}
+
+			if (!allDigits) {
+				printf("Student ID must contain only numbers!\n");
+				continue;
+			}
+
+			// Check length
+			if (strlen(idInput) != 6) {
+				printf("Student ID must be exactly 6 digits!\n");
+				continue;
+			}
+
+			*studentID = atoi(idInput);
+
+			// Check duplicate ID with inline confirmation
+			if (isDuplicateID(ht, *studentID)) {
+				char response;
+				do {
+					printf("Warning: This Student ID already has a meeting!\n");
+					printf("Continue anyway? (y/n): ");
+					scanf_s(" %c", &response);
+					cleanBuffer();
+					response = tolower(response);
+
+					if (response == 'n') {
+						break; // Will restart ID entry
+					}
+					else if (response == 'y') {
+						goto ID_VALIDATED; // Skip to end of ID validation
+					}
+					printf("Invalid input! Please enter 'y' or 'n' only.\n");
+				} while (1);
+				continue;
+			}
+		ID_VALIDATED:
+			break;
+		}
+	} while (1);
+
+	// Name validation
+	do {
+		printf("Enter Name: ");
+		if (fgets(name, MAX_NAME_LENGTH, stdin) != NULL) {
+			name[strcspn(name, "\n")] = '\0';
+
+			// Check blank input
+			if (strlen(name) == 0 || strspn(name, " \t") == strlen(name)) {
+				printf("Name cannot be blank!\n");
+				continue;
+			}
+
+			// Check letters and spaces only
+			int valid = 1;
+			for (size_t i = 0; i < strlen(name); i++) {
+				if (!isalpha(name[i]) && !isspace(name[i])) {
+					valid = 0;
+					break;
+				}
+			}
+
+			if (!valid) {
+				printf("Name can only contain letters and spaces!\n");
+				continue;
+			}
+
+			// Check duplicate name with inline confirmation
+			if (isDuplicateName(ht, name)) {
+				char response;
+				do {
+					printf("Warning: This name already has a meeting!\n");
+					printf("Continue anyway? (y/n): ");
+					scanf_s(" %c", &response);
+					cleanBuffer();
+					response = tolower(response);
+
+					if (response == 'n') {
+						break; // Will restart name entry
+					}
+					else if (response == 'y') {
+						goto NAME_VALIDATED; // Skip to end of name validation
+					}
+					printf("Invalid input! Please enter 'y' or 'n' only.\n");
+				} while (1);
+				continue;
+			}
+		NAME_VALIDATED:
+			break;
+		}
+	} while (1);
+
+	// Title validation (unchanged)
+	do {
+		printf("Enter Meeting Title: ");
+		if (fgets(title, MAX_TITLE_LENGTH, stdin) != NULL) {
+			title[strcspn(title, "\n")] = '\0';
+			if (strlen(title) == 0 || strspn(title, " \t") == strlen(title)) {
+				printf("Title cannot be blank!\n");
+				continue;
+			}
+			if (strlen(title) >= MAX_TITLE_LENGTH - 1) {
+				cleanBuffer();
+				printf("Title too long! Max %d characters allowed.\n", MAX_TITLE_LENGTH - 1);
+				continue;
+			}
+			break;
+		}
+	} while (1);
 }
 
 void undoLastOperation(HashTable* ht, OperationStack* opStack, KVP** logList) {
@@ -244,18 +404,6 @@ void undoLastOperation(HashTable* ht, OperationStack* opStack, KVP** logList) {
 	}
 }
 
-// Safely read a number from stdin
-int getUserInput() {
-	char buffer[MAX_BUFFER_SIZE] = "";
-
-	if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
-		int value = 0;
-		if (sscanf_s(buffer, "%d", &value) == 1)
-			return value;
-	}
-	cleanBuffer();
-	return -1;
-}
 
 void displayKVPLog(KVP* operationLog) {
 	if (operationLog == NULL) {
