@@ -1,18 +1,18 @@
-﻿#include "UI.h"
+#include "UI.h"
 
 int main() {
-	HashTable meetingTable[TOTAL_DAYS];
-	OperationStack opStack;
-	KVP* logList = NULL;
+    HashTable meetingTable[TOTAL_DAYS];
+    initializeHashTable(meetingTable); 
+    displayMenu(meetingTable);         
+    return 0;
+}
 
-	initializeHashTable(meetingTable);
-	initStack(&opStack);
+void initializeHashTable(HashTable* ht) {
 
-	displayMenu(meetingTable, &opStack, &logList);
-
-	freeMeetingTable(meetingTable);
-	freeStack(&opStack);
-	freeKVP(logList);
-
-	return 0;
+	for (int i = 0; i < TOTAL_DAYS; i++) {
+		strcpy(ht[i].date, dates[i]);
+		ht[i].meetingQueue = (Queue*)malloc(sizeof(Queue));
+		ht[i].meetingQueue->front = ht[i].meetingQueue->back = NULL;
+		ht[i].meetingQueue->count = 0;
+	}
 }
