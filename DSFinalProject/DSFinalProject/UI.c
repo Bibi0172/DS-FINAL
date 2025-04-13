@@ -1,7 +1,4 @@
-﻿#include "UI.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>  
+#include "UI.h"
 
 static int logCounter = 1;
 
