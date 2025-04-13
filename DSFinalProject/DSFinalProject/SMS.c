@@ -1,12 +1,10 @@
-﻿#include "SMS.h"
+#include "SMS.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 // The global array of dates
 char* dates[TOTAL_DAYS] = { "May 1", "May 2", "May 3", "May 4", "May 5", "May 6", "May 7" };
-historyNode* historyHead = NULL;
-
 
 void initializeHashTable(HashTable* ht) {
 	for (int i = 0; i < TOTAL_DAYS; i++) {
@@ -49,7 +47,7 @@ int findHashIndex(HashTable* ht, char* date) {
 	return -1;
 }
 
-void insertMeeting(HashTable* ht, char* date, int studentID, char* name, char* title, int time) {
+void insertMeeting(HashTable* ht, char* date, int studentID, char* name, char* title) {
 	int index = findHashIndex(ht, date);
 
 	if (index == -1) {
@@ -58,15 +56,15 @@ void insertMeeting(HashTable* ht, char* date, int studentID, char* name, char* t
 	}
 	Queue* queue = ht[index].meetingQueue;
 
-	// Check if time slot is already taken
-	Meeting* current = queue->front;
-	while (current != NULL) {
-		if (current->time == time) {
-			printf("The %d time slot is already booked on %s. Please choose a different time.\n", time, date);
-			return;
-		}
-		current = current->next;
-	}
+	//// Check if time slot is already taken
+	//Meeting* current = queue->front;
+	//while (current != NULL) {
+	//	if (current->time == time) {
+	//		printf("The %d time slot is already booked on %s. Please choose a different time.\n", time, date);
+	//		return;
+	//	}
+	//	current = current->next;
+	//}
 
 	// Check if maximum slots are reached
 	if (queue->count >= MAX_SLOTS) {
@@ -85,7 +83,7 @@ void insertMeeting(HashTable* ht, char* date, int studentID, char* name, char* t
 	newMeeting->studentID = studentID;
 	strcpy_s(newMeeting->name, MAX_NAME_LENGTH, name);
 	strcpy_s(newMeeting->title, MAX_TITLE_LENGTH, title);
-	newMeeting->time = time;
+	//newMeeting->time = time;
 	newMeeting->next = NULL;
 
 	// Enqueue in FIFO order
@@ -98,7 +96,7 @@ void insertMeeting(HashTable* ht, char* date, int studentID, char* name, char* t
 	}
 	queue->count++;
 
-	printf("Meeting booked successfully on %s for Student ID %d at %d.\n", date, studentID, time);
+	printf("Meeting booked successfully on %s for Student ID %d .\n", date, studentID);
 }
 
 Operation* cancelMeeting(HashTable* ht, char* date, int studentID) {
@@ -106,13 +104,13 @@ Operation* cancelMeeting(HashTable* ht, char* date, int studentID) {
 		printf("Error: Invalid parameters for cancellation\n");
 		return NULL;
 	}
-	
+
 	int index = findHashIndex(ht, date);
 	if (index == -1) {
 		printf("Invalid date! Please enter a valid date.\n");
 		return NULL;
 	}
-	
+
 	Queue* queue = ht[index].meetingQueue;
 	if (queue->front == NULL) {
 		printf("\nNo meetings found on %s.\n", date);
@@ -125,26 +123,26 @@ Operation* cancelMeeting(HashTable* ht, char* date, int studentID) {
 		prev = temp;
 		temp = temp->next;
 	}
-	
+
 	if (temp == NULL) {
 		printf("No meeting found for Student ID %d on %s.\n", studentID, date);
 		return NULL;
 	}
-	
+
 	// Allocate an Operation record to save details for undo (cancellation operation)
 	Operation* op = (Operation*)malloc(sizeof(Operation));
 	if (op == NULL) {
 		printf("Failed to allocate memory for operation record.\n");
 		return NULL;
 	}
-	
+
 	op->type = OP_CANCEL;
 	strcpy_s(op->date, MAX_DATE_LENGTH, date);
 	op->studentID = temp->studentID;
 	strcpy_s(op->name, MAX_NAME_LENGTH, temp->name);
 	strcpy_s(op->title, MAX_TITLE_LENGTH, temp->title);
-	op->timeSlot = temp->time;
-	
+	//op->timeSlot = temp->time;
+
 	// Remove node from the queue
 	if (prev == NULL) {  // Removing the first node
 		queue->front = temp->next;
@@ -152,13 +150,13 @@ Operation* cancelMeeting(HashTable* ht, char* date, int studentID) {
 	else {
 		prev->next = temp->next;
 	}
-	
+
 	if (queue->back == temp) {
 		queue->back = prev;
 	}
-	
+
 	free(temp);
-	
+
 	queue->count--;
 	printf("Meeting canceled for Student ID %d on %s.\n", studentID, date);
 	return op;
@@ -179,8 +177,8 @@ void searchMeeting(HashTable* ht, char* date, int studentID) {
 	Meeting* current = ht[index].meetingQueue->front;
 	while (current != NULL) {
 		if (current->studentID == studentID) {
-			printf("Meeting Found!\nDate: %s\nStudent: %s\nTitle: %s\nTime: %d\n",
-				date, current->name, current->title, current->time);
+			printf("Meeting Found!\nDate: %s\nStudent: %s\nTitle: %s\n",
+				date, current->name, current->title);
 			return;
 		}
 		current = current->next;
@@ -206,8 +204,8 @@ void viewUpcomingMeetings(HashTable* ht) {
 		}
 		else {
 			while (current != NULL) {
-				printf("  - Student: %s (ID: %d) | Title: %s | Time: %d\n",
-					current->name, current->studentID, current->title, current->time);
+				printf("  - Student: %s (ID: %d) | Title: %s \n",
+					current->name, current->studentID, current->title);
 				current = current->next;
 			}
 		}
@@ -241,7 +239,7 @@ void freeMeetingTable(HashTable* meetingTable) {
 // Remove a meeting matching details from an operation record (used for undo of booking)
 int removeMeeting(HashTable* ht, Operation* op) {
 	int index = findHashIndex(ht, op->date);
-	
+
 	if (index == -1) {
 		return 0;
 	}
@@ -250,7 +248,7 @@ int removeMeeting(HashTable* ht, Operation* op) {
 	Meeting* temp = queue->front;
 	Meeting* prev = NULL;
 	while (temp != NULL) {
-		if (temp->studentID == op->studentID && temp->time == op->timeSlot) {
+		if (temp->studentID == op->studentID) {
 			if (prev == NULL) {
 				queue->front = temp->next;
 			}
@@ -273,13 +271,13 @@ int removeMeeting(HashTable* ht, Operation* op) {
 // Reinsert a meeting from an operation record (used for undo of cancellation)
 int reinsertMeeting(HashTable* ht, Operation* op) {
 	int index = findHashIndex(ht, op->date);
-	
+
 	if (index == -1) {
 		return 0;
 	}
 
 	Queue* queue = ht[index].meetingQueue;
-	
+
 	if (queue->count >= MAX_SLOTS) {
 		printf("Cannot undo cancellation: All slots are filled for %s.\n", op->date);
 		return 0;
@@ -287,7 +285,7 @@ int reinsertMeeting(HashTable* ht, Operation* op) {
 
 	// Create a new meeting node from op details
 	Meeting* newMeeting = (Meeting*)malloc(sizeof(Meeting));
-	
+
 	if (newMeeting == NULL) {
 		return 0;
 	}
@@ -295,7 +293,7 @@ int reinsertMeeting(HashTable* ht, Operation* op) {
 	newMeeting->studentID = op->studentID;
 	strcpy_s(newMeeting->name, MAX_NAME_LENGTH, op->name);
 	strcpy_s(newMeeting->title, MAX_TITLE_LENGTH, op->title);
-	newMeeting->time = op->timeSlot;
+	//newMeeting->time = op->timeSlot;
 	newMeeting->next = NULL;
 	// Enqueue the meeting node
 	if (queue->back == NULL) {
@@ -309,52 +307,6 @@ int reinsertMeeting(HashTable* ht, Operation* op) {
 	queue->count++;
 	return 1;
 }
-//Function: addToHistory
-//Description: adds a processed meeting to the end of the history linked list
-//Parameters: Meeting meet
-//Returns none
-void addToHistory(Meeting meet) {
-	historyNode* newNode = (historyNode*)malloc(sizeof(historyNode));
-	newNode->data = meet;
-	newNode->next = NULL;
-
-	//first entry
-	if (historyHead == NULL) {
-		historyHead = newNode;
-	}
-	else {
-		historyNode* current = historyHead;
-		while (current->next != NULL) {
-			current = current->next;
-		}
-		current->next = newNode;
-	}
-}
-//Function: viewMeetingHistory
-//Description: function will display all processed meetings
-//Parameters: None
-//Returns None
-void viewMeetingHistory() {
-	if (historyHead == NULL) {
-		printf("No Meetings have been Processed\n");
-		return;
-	}
-	printf("Processed Meeting History\n");
-	historyNode* current = historyHead;
-	int count = 1;
-
-	while (current != NULL) {
-		Meeting meet = current->data;
-
-		printf("[%d] Meeting: \n", count++);
-		printf("Student     : %s\n", meet.name);
-		printf("ID          : %d\n", meet.studentID);
-		printf("Title       : %s\n", meet.title);
-		printf("Time        : %d\n", meet.time);
-		current = current->next;
-	}
-	printf("\n");
-}
 
 void initStack(OperationStack* stack) {
 	stack->top = NULL;
@@ -366,7 +318,7 @@ bool isStackEmpty(OperationStack* stack) {
 
 void pushStack(OperationStack* stack, Operation op) {
 	StackNode* newNode = (StackNode*)malloc(sizeof(StackNode));
-	
+
 	if (newNode == NULL) {
 		printf("Stack: Unable to allocate memory for new operation.\n");
 		return;
@@ -382,35 +334,35 @@ int popStack(OperationStack* stack, Operation* op) {
 	{
 		return 0;
 	}
-	
+
 	StackNode* temp = stack->top;
 	*op = temp->op;
 	stack->top = temp->next;
 	free(temp);
-	
+
 	return 1;
 }
 
 void freeStack(OperationStack* stack) {
 	StackNode* current = stack->top;
-	
+
 	while (current != NULL) {
 		StackNode* temp = current;
 		current = current->next;
 		free(temp);
 	}
-	
+
 	stack->top = NULL;
 }
 
 void insertKVP(KVP** head, char* key, char* value) {
 	KVP* newNode = (KVP*)malloc(sizeof(KVP));
-	
+
 	if (newNode == NULL) {
 		printf("Failed to allocate memory for KVP node.\n");
 		return;
 	}
-	
+
 	strcpy_s(newNode->key, MAX_KEY_LENGTH_KVP, key);
 	strcpy_s(newNode->value, MAX_VALUE_LENGTH_KVP, value);
 	newNode->next = *head;

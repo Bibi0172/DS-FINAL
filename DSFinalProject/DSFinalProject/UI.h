@@ -17,19 +17,18 @@ typedef enum {
 	VIEW,
 	UNDO,
 	DISPLAY_LOG,
-	VIEW_HISTORY,
 	EXIT_PROGRAM,
 } KIND_OF_MENU;
 
 void displayMenu(HashTable* ht, OperationStack* opStack, KVP** logList);
 int validMenuChoice(int maxNumber);
 void cleanBuffer();
-int getValidDateChoice();
-int getValidTimeSlot(Queue* q);
+int getValidDateChoice(HashTable* ht);
+//int getValidTimeSlot(Queue* q);
 void getValidUserInput(HashTable* ht, int* studentID, char* name, char* title);
 int isDuplicateName(HashTable* ht, const char* name);
 int isDuplicateID(HashTable* ht, int studentID);
-int isTimeSlotBooked(Queue* q, int time);
+//int isTimeSlotBooked(Queue* q, int time);
 
 void undoLastOperation(HashTable* ht, OperationStack* opStack, KVP** logList);
 void displayKVPLog(KVP* operationLog);
