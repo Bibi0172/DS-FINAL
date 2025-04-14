@@ -17,14 +17,15 @@ void displayMenu(HashTable* ht, OperationStack* operationStack, KVP** logList) {
 		printf("\n===========================================\n");
 		printf("          Student Meeting Scheduler        \n");
 		printf("===========================================\n");
-		printf("1. Book Meeting\n2. Cancel Meeting\n3. Search Meeting\n4. View Upcoming Meetings\n5. Undo Last Operation\n6. Display Operation Log\n7. Exit\n");
+		printf("1. Book Meeting\n2. Cancel Meeting\n3. Search Meeting\n4. View Upcoming Meetings\n5. Undo Last Operation\n6. Display Operation Log\n7. View Meeting History\n 8.Exit\n");
 
 		menuNum = validMenuChoice(7);
 		switch (menuNum) {
 		case BOOK:
 			dateChoice = getValidDateChoice(ht);
-			if (dateChoice == -1) break;
-
+			if (dateChoice == -1) {
+				break;
+			}
 
 			Queue* queue = ht[dateChoice].meetingQueue;
 			if (queue->count >= MAX_SLOTS) {
@@ -85,6 +86,9 @@ void displayMenu(HashTable* ht, OperationStack* operationStack, KVP** logList) {
 			break;
 		case UNDO:
 			undoLastOperation(ht, operationStack, logList);
+			break;
+		case VIEW_HISTORY:
+			viewMeetingHistory();
 			break;
 		case DISPLAY_LOG:
 			displayKVPLog(*logList);
