@@ -291,7 +291,7 @@ void getValidUserInput(HashTable* ht, int* studentID, char* name, char* title) {
 				do {
 					printf("Warning: This Student ID already has a meeting!\n");
 					printf("Continue anyway? (y/n): ");
-					scanf_s(" %c", &response);
+					scanf_s(" %c", &response, (int)sizeof(response));
 					cleanBuffer();
 					response = tolower(response);
 
@@ -350,7 +350,7 @@ void getValidUserInput(HashTable* ht, int* studentID, char* name, char* title) {
 				do {
 					printf("Warning: This name already has a meeting!\n");
 					printf("Continue anyway? (y/n): ");
-					scanf_s(" %c", &response);
+					scanf_s(" %c", &response, (int)sizeof(response));
 					cleanBuffer();
 					response = tolower(response);
 

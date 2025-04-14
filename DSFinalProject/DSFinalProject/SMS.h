@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #define TOTAL_DAYS 7
 #define MAX_SLOTS 3
@@ -106,3 +107,4 @@ typedef struct KVP {
 void insertKVP(KVP** head, char* key, char* value);
 char* searchKVP(KVP* head, char* key);
 void freeKVP(KVP* head);
+#endif

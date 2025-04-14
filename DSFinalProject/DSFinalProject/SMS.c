@@ -350,7 +350,7 @@ void viewMeetingHistory() {
 		printf("Student     : %s\n", meet.name);
 		printf("ID          : %d\n", meet.studentID);
 		printf("Title       : %s\n", meet.title);
-		printf("Time        : %d\n", meet.time);
+		//printf("Time        : %d\n", meet.time);
 		current = current->next;
 	}
 	printf("\n");
