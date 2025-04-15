@@ -6,7 +6,7 @@ THIS PROJECT IS FOR OUR FINAL PROJECT
 - Presentation & Demo: Week of April 14th
 ```
 ### 1. Introduction
-
+- 
 ### 2. How to run the project
 
 ### 3. Team Information

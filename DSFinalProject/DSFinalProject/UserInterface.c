@@ -1,9 +1,9 @@
-#include "UI.h"
+#include "UserInterface.h"
 
-// Function: displayMenu
-// Description: Displays the main menu and handles user selections
-// Parameters: HashTable* ht, OperationStack* operationStack, KVP** logList
-// Returns: None
+//Function: displayMenu
+//Description: Displays the main menu and handles user selections
+//Parameters: HashTable* ht, OperationStack* operationStack, KVP** logList
+//Returns: None
 void displayMenu(HashTable* ht, OperationStack* operationStack, KVP** logList) {
 	if (ht == NULL) {
 		printf("Error: Invalid hash table\n");
@@ -15,22 +15,25 @@ void displayMenu(HashTable* ht, OperationStack* operationStack, KVP** logList) {
 	char logKey[LOG_KEY_LENGHT] = "", logMsg[MAX_LOG_LENGTH] = "";
 	Operation op = { 0 };
 
+
 	do {
 		printf("\n+--------------------------------------------------+\n");
 		printf("|            Student Meeting Scheduler             |\n");
 		printf("+--------------------------------------------------+\n");
 		printf("| 1. Book a Meeting                                |\n");
-		printf("| 2. Process Meeting                               |\n");
-		printf("| 3. Cancel a Meeting                              |\n");
-		printf("| 4. Search for a Meeting                          |\n");
-		printf("| 5. View Upcoming Meetings                        |\n");
-		printf("| 6. Undo Last Operation                           |\n");
-		printf("| 7. View Meeting History                          |\n");
+		printf("| 2. View Upcoming Meetings                        |\n");
+		printf("| 3. Process Meeting                               |\n");
+		printf("| 4. Cancel a Meeting                              |\n");
+		printf("| 5. Search for a Meeting                          |\n");
+		printf("| 6. View Meeting History                          |\n");
+		printf("| 7. Undo Last Operation                           |\n");
 		printf("| 8. Display Operation Log                         |\n");
 		printf("| 9. Exit Scheduler                                |\n");
 		printf("+--------------------------------------------------+\n");
 		printf("Select an option (1-9): ");
+
 		menuNum = validMenuChoice(9);
+
 		switch (menuNum) {
 		case BOOK:
 			dateChoice = getValidDateChoice(ht);
@@ -64,9 +67,15 @@ void displayMenu(HashTable* ht, OperationStack* operationStack, KVP** logList) {
 			insertKVP(logList, logKey, logMsg);
 			break;
 
+
+		case VIEW:
+			viewUpcomingMeetings(ht);
+			break;
+
 		case PROCESS_MEETING:
 			processFirstMeeting(ht, operationStack, logList);
 			break;
+
 		case CANCEL:
 			printf("\n+--------------------------------------------------+\n");
 			printf("| Please enter the Student ID to Cancel for:       |\n");
@@ -106,16 +115,12 @@ void displayMenu(HashTable* ht, OperationStack* operationStack, KVP** logList) {
 			searchMeeting(ht, NULL, studentID);
 			break;
 
-		case VIEW:
-			viewUpcomingMeetings(ht);
+		case VIEW_HISTORY:
+			viewMeetingHistory();
 			break;
 
 		case UNDO:
 			undoLastOperation(ht, operationStack, logList);
-			break;
-
-		case VIEW_HISTORY:
-			viewMeetingHistory();
 			break;
 
 		case DISPLAY_LOG:
@@ -129,10 +134,10 @@ void displayMenu(HashTable* ht, OperationStack* operationStack, KVP** logList) {
 	} while (menuNum != EXIT_PROGRAM);
 }
 
-// Function: getUserInput
-// Description: Gets and validates numeric input from user for Student ID.
-// Parameters: None
-// Returns: int
+//Function: getUserInput
+//Description: Gets and validates numeric input from user for Student ID.
+//Parameters: None
+//Returns: int
 int getUserInput() {
 	char inputBuffer[MAX_BUFFER_SIZE] = "";
 	int value = 0;
@@ -179,13 +184,15 @@ int getUserInput() {
 			return -2;
 		}
 		printf("Invalid input format. Please try again or 'm' for Main Menu\n");
+
 	}
+
 }
 
-// Function: cleanBuffer
-// Description: Clears any remaining input from the input buffer.
-// Parameters: None
-// Returns: None
+//Function: cleanBuffer
+//Description: Clears any remaining input from the input buffer.
+//Parameters: None
+//Returns: None
 void cleanBuffer() {
 	int extraChar = 0;
 	while ((extraChar = getchar()) != '\n' && extraChar != EOF);
@@ -193,47 +200,47 @@ void cleanBuffer() {
 
 // Function: validMenuChoice
 // Description: Prompts user for a menu selection and validates it.
-// Parameters: int maxNumber
-// Returns: int
+// Parameters: int maxNumber - the maximum valid menu option
+// Returns: int - the validated choice from the user
 int validMenuChoice(int maxNumber) {
 	int choice;
 	char buffer[100];
+	char extra;
 
 	while (1) {
+
 		if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
-			// Check if input is just a single newline (empty input)
+			// Check for empty input (just enter key)
 			if (buffer[0] == '\n') {
-				printf("Invalid Input. Please enter a number between 1 and %d.\n", maxNumber);
-				printf("Enter your choice (1-%d): ", maxNumber);
+				printf("Invalid Input. Input cannot be empty.\n");
 				continue;
 			}
 
-			// Try to read as integer
-			if (sscanf_s(buffer, "%d", &choice) == 1) {
+			// Check if input is a valid integer and doesn't have extra characters
+			if (sscanf_s(buffer, "%d %c", &choice, &extra, 1) == 1) {
 				if (choice >= 1 && choice <= maxNumber) {
 					return choice;
 				}
 			}
-			// If we get here, input was invalid
+
+			// Otherwise it's invalid
 			printf("Invalid Input. Please enter a number between 1 and %d.\n", maxNumber);
 		}
 		else {
-			// Handle EOF case
-			cleanBuffer();
-			return -1;
+			cleanBuffer(); // In case of EOF or input error
 		}
-		printf("Enter your choice (1-%d): ", maxNumber);
 	}
 }
 
-// Function: getValidDateChoice
-// Description: Displays dates with availability and prompts user to choose a date.
-// Parameters: HashTable* ht
-// Returns: int
+//Function: getValidDateChoice
+//Description: Displays dates with availability and prompts user to choose a date.
+//Parameters: HashTable* ht
+//Returns: int
 int getValidDateChoice(HashTable* ht) {
 	char buffer[100];
 	int choice;
 
+	char extra;
 	printf("\n+-----------------------------------------------------------+\n");
 	printf("|                    Available Dates                        |\n");
 	printf("+------+-------------+---------------+----------------------+\n");
@@ -258,7 +265,11 @@ int getValidDateChoice(HashTable* ht) {
 					return -1;  // Return to main menu
 				}
 			}
-
+			if (sscanf_s(buffer, "%d %c", &choice, &extra, 1) == 1) {
+				if (choice >= 1 && choice <= TOTAL_DAYS) {
+					return choice;
+				}
+			}
 			// Try to read as integer
 			if (sscanf_s(buffer, "%d", &choice) == 1) {
 				if (choice >= 1 && choice <= TOTAL_DAYS) {
@@ -313,11 +324,11 @@ bool isDuplicateName(HashTable* ht, const char* name) {
 	return false; // No duplicate found
 }
 
-// Function: getValidStudentID
-// Description: Prompts user to enter a valid 6-digit student ID. If it's a duplicate, it asks for confirmation and retrieves the existing name if accepted.
-// Parameters: HashTable* ht - the hash table to check for duplicates,
-//             char* existingName - buffer to store the name if duplicate ID is reused
-// Returns: int - the validated student ID, or -1 if the user chooses to return to the menu
+//Function: getValidStudentID
+//Description: Prompts user to enter a valid 6-digit student ID. If it's a duplicate, it asks for confirmation and retrieves the existing name if accepted.
+//Parameters: HashTable* ht - the hash table to check for duplicates,
+//            char* existingName - buffer to store the name if duplicate ID is reused
+//Returns: int - the validated student ID, or -1 if the user chooses to return to the menu
 int getValidStudentID(HashTable* ht, char* existingName)
 {
 	char inputBuffer[50];
@@ -392,12 +403,13 @@ int getValidStudentID(HashTable* ht, char* existingName)
 	}
 }
 
-// Function: getValidName
-// Description: Prompts user to enter a valid name and checks for duplicates with confirmation.
-// Parameters: HashTable* ht - the hash table to check for duplicate names,
-//             char* name - buffer to store the validated name
-// Returns: None
+//Function: getValidName
+//Description: Prompts user to enter a valid name and checks for duplicates with confirmation.
+//Parameters: HashTable* ht - the hash table to check for duplicate names,
+//            char* name - buffer to store the validated name
+//Returns: None
 void getValidName(HashTable* ht, char* name)
+
 {
 	while (1) {
 		printf("Enter Name : ");
@@ -451,10 +463,10 @@ void getValidName(HashTable* ht, char* name)
 	}
 }
 
-// Function: getValidTitle
-// Description: Prompts user to enter a valid non-blank meeting title and stores it.
-// Parameters: char* title - buffer to store the validated title
-// Returns: None
+//Function: getValidTitle
+//Description: Prompts user to enter a valid non-blank meeting title and stores it.
+//Parameters: char* title - buffer to store the validated title
+//Returns: None
 void getValidTitle(char* title)
 {
 	while (1) {
@@ -483,13 +495,13 @@ void getValidTitle(char* title)
 	}
 }
 
-// Function: getValidUserInput
-// Description: Combines student ID, name, and title validation to gather input for booking a meeting.
-// Parameters: HashTable* ht - the hash table to check for duplicates,
+//Function: getValidUserInput
+//Description: Combines student ID, name, and title validation to gather input for booking a meeting.
+//Parameters: HashTable* ht - the hash table to check for duplicates,
 //            int* studentID - pointer to store the validated student ID,
 //            char* name - buffer to store the name,
 //            char* title - buffer to store the meeting title
-// Returns: None
+//Returns: None
 void getValidUserInput(HashTable* ht, int* studentID, char* name, char* title)
 {
 	// Clear name buffer at start to ensure fresh input
@@ -523,22 +535,15 @@ int getValidDateChoiceForStudent(HashTable* ht, int studentID)
 {
 	char buffer[100];
 	int choice;
-	int validDates[TOTAL_DAYS]; // Changed to only store unique dates
+	int validDates[TOTAL_DAYS * MAX_SLOTS]; // Increased size to handle multiple
 	int validCount = 0;
-	int meetingCount = 0;
-	bool dateAdded[TOTAL_DAYS] = { false }; // Track which dates have been added
 
 	// First, find all meetings for this student
 	for (int i = 0; i < TOTAL_DAYS; i++) {
 		Meeting* current = ht[i].meetingQueue->front;
 		while (current != NULL) {
 			if (current->studentID == studentID) {
-				meetingCount++;
-				// Only add the date if it hasn't been added yet
-				if (!dateAdded[i]) {
-					validDates[validCount++] = i;
-					dateAdded[i] = true;
-				}
+				validDates[validCount++] = i;
 			}
 			current = current->next;
 		}
@@ -548,7 +553,7 @@ int getValidDateChoiceForStudent(HashTable* ht, int studentID)
 		printf("No meetings found for Student ID %d.\n", studentID);
 		return -1;
 	}
-	int displayCount = 0;
+
 	printf("\n+-----------------------------------------------------------+\n");
 	printf("|                    Available Dates for Student ID %d        |\n", studentID);
 	printf("+------+-------------+---------------+----------------------+\n");
@@ -560,17 +565,16 @@ int getValidDateChoiceForStudent(HashTable* ht, int studentID)
 		Meeting* current = ht[dateIndex].meetingQueue->front;
 		while (current != NULL) {
 			if (current->studentID == studentID) {
-				printf("| %-4d | %-11s | %-13s | %-20s |\n", displayCount + 1, dates[dateIndex], current->name, current->title);
-				displayCount++;
+				printf("| %-4d | %-11s | %-13s | %-20s |\n", i + 1, dates[dateIndex], current->name, current->title);
+				break;
 			}
 			current = current->next;
 		}
 	}
 	printf("+------+-------------+---------------+----------------------+\n");
-	printf("Total meetings found for Student ID %d: %d\n", studentID, meetingCount);
 
 	while (1) {
-		printf("Enter your choice (1-%d) or M to return to the main menu: ", displayCount);
+		printf("Enter your choice (1-%d) or M to return to the main menu: ", validCount);
 
 		if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
 			// Check for 'M' or 'm' to return to main menu
@@ -582,27 +586,13 @@ int getValidDateChoiceForStudent(HashTable* ht, int studentID)
 
 			// Try to read as integer
 			if (sscanf_s(buffer, "%d", &choice) == 1) {
-				if (choice >= 1 && choice <= displayCount) {
-					// Find the corresponding date index
-					int count = 0;
-					for (int i = 0; i < validCount; i++) {
-						int dateIndex = validDates[i];
-						Meeting* current = ht[dateIndex].meetingQueue->front;
-						while (current != NULL) {
-							if (current->studentID == studentID) {
-								count++;
-								if (count == choice) {
-									return dateIndex; // Return the actual date index
-								}
-							}
-							current = current->next;
-						}
-					}
+				if (choice >= 1 && choice <= validCount) {
+					return validDates[choice - 1]; // Return the actual date index
 				}
 			}
 
 			// If we get here, input was invalid
-			printf("Invalid choice. Please enter a number between 1 and %d or M to return.\n", displayCount);
+			printf("Invalid choice. Please enter a number between 1 and %d or M to return.\n", validCount);
 		}
 		else {
 			// Handle EOF case

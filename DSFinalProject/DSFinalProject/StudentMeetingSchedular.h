@@ -1,5 +1,5 @@
-#ifndef SMS_H
-#define SMS_H
+#ifndef STUDENTMEETINGSHEDULAR_H
+#define STUDENTMEETINGSHEDULAR_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,7 +7,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 
-static int logCounter = 1;
+extern int logCounter;
 
 #define TOTAL_DAYS 7
 #define MAX_SLOTS 3
@@ -24,6 +24,7 @@ typedef struct Meeting {
 	int studentID;
 	char name[MAX_NAME_LENGTH];
 	char title[MAX_TITLE_LENGTH];
+	char date[MAX_DATE_LENGTH];  
 	struct Meeting* next;
 } Meeting;
 

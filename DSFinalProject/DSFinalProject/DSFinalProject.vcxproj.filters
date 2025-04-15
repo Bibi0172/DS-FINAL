@@ -15,21 +15,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Program.c">
+    <ClCompile Include="Main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UI.c">
+    <ClCompile Include="UserInterface.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SMS.c">
+    <ClCompile Include="StudentMeetingSchedular.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SMS.h">
+    <ClInclude Include="StudentMeetingSchedular.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UI.h">
+    <ClInclude Include="UserInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

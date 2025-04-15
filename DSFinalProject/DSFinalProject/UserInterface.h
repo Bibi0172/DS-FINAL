@@ -1,7 +1,7 @@
-#ifndef UI_H
-#define UI_H
+#ifndef USERINTERFACE_H
+#define USERINTERFACE_H
 
-#include "SMS.h"
+#include "StudentMeetingSchedular.h"
 #include <stdbool.h>
 
 #define MAX_MEETING_SLOT_COUNT	3
@@ -13,12 +13,12 @@
 
 typedef enum {
 	BOOK = 1,
+	VIEW,
 	PROCESS_MEETING,
 	CANCEL,
 	SEARCH,
-	VIEW,
-	UNDO,
 	VIEW_HISTORY,
+	UNDO,
 	DISPLAY_LOG,
 	EXIT_PROGRAM,
 } KIND_OF_MENU;

@@ -1,5 +1,5 @@
-#include "SMS.h"
-#include "UI.h"
+#include "StudentMeetingSchedular.h"
+#include "UserInterface.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,6 +8,7 @@
 // The global array of dates
 char* dates[TOTAL_DAYS] = { "May 1", "May 2", "May 3", "May 4", "May 5", "May 6", "May 7" };
 historyNode* historyHead = NULL;
+logCounter = 1;
 
 //Function: initializeHashTable
 //Description: Initializes the hash table by assigning date values and allocating memory for meeting queues.
@@ -225,7 +226,6 @@ void searchMeeting(HashTable* ht, char* date, int studentID) {
 		printf("+--------------------------------------------------+\n");
 	}
 }
-
 //Function: viewUpcomingMeetings
 //Description: Displays all upcoming meetings grouped by date, indicating availability.
 //Parameters: HashTable* ht - the hash table to display
@@ -347,7 +347,6 @@ int reinsertMeeting(HashTable* ht, Operation* op) {
 	newMeeting->studentID = op->studentID;
 	strcpy_s(newMeeting->name, MAX_NAME_LENGTH, op->name);
 	strcpy_s(newMeeting->title, MAX_TITLE_LENGTH, op->title);
-	//newMeeting->time = op->timeSlot;
 	newMeeting->next = NULL;
 	// Enqueue the meeting node
 	if (queue->back == NULL) {
@@ -368,6 +367,11 @@ int reinsertMeeting(HashTable* ht, Operation* op) {
 //Returns none
 void addToHistory(Meeting meet) {
 	historyNode* newNode = (historyNode*)malloc(sizeof(historyNode));
+	if (newNode == NULL) {
+		printf("EOM\n");
+		return;
+	}
+
 	newNode->data = meet;
 	newNode->next = NULL;
 
@@ -393,23 +397,30 @@ void viewMeetingHistory() {
 		printf("No Meetings have been Processed\n");
 		return;
 	}
-	printf("Processed Meeting History\n");
+
+	printf("\n+-----------------------------------------------------------+\n");
+	printf("|                    Processed Meeting History              |\n");
+	printf("+------+------------+----------------+----------------------+\n");
+	printf("| No.  | Student ID | Name           | Meeting Title        |\n");
+	printf("+------+------------+----------------+----------------------+\n");
+
 	historyNode* current = historyHead;
 	int count = 1;
 
 	while (current != NULL) {
 		Meeting meet = current->data;
-
-		printf("[%d] Meeting: \n", count++);
-		printf("Student     : %s\n", meet.name);
-		printf("ID          : %d\n", meet.studentID);
-		printf("Title       : %s\n", meet.title);
+		printf("| %-4d | %-10d | %-14s | %-20s |\n",
+			count++,
+			meet.studentID,
+			meet.name,
+			meet.title);
 		current = current->next;
 	}
+
+	printf("+------+------------+----------------+----------------------+\n");
 	printf("\n");
 }
 
-//Function: initStack  
 //Description: Initializes the operation stack by setting its top pointer to NULL.
 //Parameters: OperationStack* stack - pointer to the stack to initialize
 //Returns: None
