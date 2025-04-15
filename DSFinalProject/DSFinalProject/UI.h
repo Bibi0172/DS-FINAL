@@ -2,6 +2,7 @@
 #define UI_H
 
 #include "SMS.h"
+#include <stdbool.h>
 
 #define MAX_MEETING_SLOT_COUNT	3
 #define LOG_KEY_LENGHT	10
@@ -12,6 +13,7 @@
 
 typedef enum {
 	BOOK = 1,
+	PROCESS_MEETING,
 	CANCEL,
 	SEARCH,
 	VIEW,
@@ -25,14 +27,13 @@ void displayMenu(HashTable* ht, OperationStack* opStack, KVP** logList);
 int validMenuChoice(int maxNumber);
 void cleanBuffer();
 int getValidDateChoice(HashTable* ht);
-//int getValidTimeSlot(Queue* q);
+int getValidStudentID(HashTable* ht, char* existingName);
+void getValidName(HashTable* ht, char* name);
+void getValidTitle(char* title);
 void getValidUserInput(HashTable* ht, int* studentID, char* name, char* title);
-int isDuplicateName(HashTable* ht, const char* name);
-int isDuplicateID(HashTable* ht, int studentID);
-//int isTimeSlotBooked(Queue* q, int time);
-
-void undoLastOperation(HashTable* ht, OperationStack* opStack, KVP** logList);
-void displayKVPLog(KVP* operationLog);
+bool isDuplicateName(HashTable* ht, const char* name);
+bool isDuplicateID(HashTable* ht, int studentID);
+int getValidDateChoiceForStudent(HashTable* ht, int studentID);
 
 int getUserInput();
 

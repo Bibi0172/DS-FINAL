@@ -7,6 +7,8 @@
 #include <stdbool.h>
 #include <ctype.h>
 
+static int logCounter = 1;
+
 #define TOTAL_DAYS 7
 #define MAX_SLOTS 3
 #define MAX_NAME_LENGTH     50
@@ -107,4 +109,9 @@ typedef struct KVP {
 void insertKVP(KVP** head, char* key, char* value);
 char* searchKVP(KVP* head, char* key);
 void freeKVP(KVP* head);
+
+void undoLastOperation(HashTable* ht, OperationStack* opStack, KVP** logList);
+void displayKVPLog(KVP* operationLog);
+void processFirstMeeting(HashTable* ht, OperationStack* opStack, KVP** logList);
+
 #endif
