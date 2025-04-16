@@ -267,7 +267,7 @@ int getValidDateChoice(HashTable* ht) {
 			}
 			if (sscanf_s(buffer, "%d %c", &choice, &extra, 1) == 1) {
 				if (choice >= 1 && choice <= TOTAL_DAYS) {
-					return choice;
+					return choice - 1;
 				}
 			}
 			// Try to read as integer
