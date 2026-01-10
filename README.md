@@ -1,26 +1,63 @@
-# DS-FINAL
-THIS PROJECT IS FOR OUR FINAL PROJECT 
+# Student Meeting Scheduler
 
-```
-- Final Submission: Aprial 12th (SAT), 2025
-- Presentation & Demo: Week of April 14th
-```
-### 1. Introduction
-    We made a student meeting scheduler program using different data structures we learned in the class. This is a console-based program written in the C language. The program helps users manage meetings with features like booking, canceling, and displaying history.
-    The program uses various data structures such as hash table, queue, and stack etc. Through this project, we show our understanding of basic data structures and how to use them.
-### 2. How to run the project
-    The program was developed using Visual Studio 2022. You can open the program by double-clicking the **DSFinalProject.sln** file in the folder. After that, you can run the program by pressing **F5** or **Ctrl + F5**.
-### 3. Team Information
-- Jobair Ahmed Jisan
-- Bibi Murwared Enayat Zada
-- Nathaniel Hickling
-- Daeseong Yu
-### 4. Role of Implementation
-- Insert meeting - Bibi
-- Cancel meeting - Jisan
-- Search meeting - Nate
-- View upcoming meeting - Jisan & Nate
-- Process meeting - Jisan
-- View meeting history - Nate
-- Free all data structures - Daeseong
-- Validates user input -Bibi & Daeseong
+## Overview
+The Student Meeting Scheduler is a console-based application developed in C as a final academic team project.  
+The system allows users to manage student meetings by booking, canceling, searching, and viewing upcoming and past meetings.
+
+This project demonstrates the practical use of fundamental data structures and reinforces problem-solving, memory management, and modular programming concepts.
+
+---
+
+## Features
+- Insert and schedule meetings
+- Cancel meetings
+- Search for meetings
+- View upcoming meetings
+- Process meetings in order
+- Display meeting history
+- Validate user input
+- Free allocated memory and manage data safely
+
+---
+
+## Data Structures Used
+- Hash Table
+- Queue
+- Stack
+
+These data structures were used to ensure efficient storage, retrieval, and processing of meeting data.
+
+---
+
+## Technologies
+- C
+- Visual Studio 2022
+- Git & GitHub
+
+---
+
+## How to Run the Project
+1. Open the `DSFinalProject.sln` file in **Visual Studio 2022**
+2. Build the solution
+3. Run the program using **F5** or **Ctrl + F5**
+
+---
+
+## My Contributions
+- Implemented the meeting insertion functionality
+- Contributed to input validation logic
+- Assisted with testing and debugging
+- Collaborated with team members using GitHub
+
+---
+
+## Team Members
+- Jobair Ahmed Jisan  
+- **Bibi Murwared Enayat Zada**  
+- Nathaniel Hickling  
+- Daeseong Yu  
+
+---
+
+## Notes
+This repository represents a collaborative academic project and is shared for portfolio and resume purposes.
